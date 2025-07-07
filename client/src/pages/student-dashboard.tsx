@@ -1,13 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
-import { BookOpen, TrendingUp, Calendar, Brain, User, LogOut } from "lucide-react";
+import { BookOpen, TrendingUp, Calendar, Brain, User, LogOut, Search, Filter, Grid, List } from "lucide-react";
 import { Link } from "wouter";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import CourseCard from "@/components/course-card";
@@ -15,7 +19,13 @@ import AiInsights from "@/components/ai-insights";
 
 export default function StudentDashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const { toast: showToast } = toast;
+  const { toast: showToast } = useToast();
+  
+  // State for course filtering and search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Redirect if not authenticated
   useEffect(() => {

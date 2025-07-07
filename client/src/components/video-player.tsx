@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Play, Pause, Volume2, Maximize, SkipBack, SkipForward } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Play, Pause, Volume2, Maximize, SkipBack, SkipForward, RotateCcw, RotateCw, Settings, Bookmark, BookmarkCheck } from "lucide-react";
 import type { Lesson } from "@shared/schema";
 
 interface VideoPlayerProps {
@@ -9,6 +11,22 @@ interface VideoPlayerProps {
   onProgress?: (watchTime: number) => void;
   onComplete?: (watchTime: number) => void;
 }
+
+interface VideoSegment {
+  id: string;
+  title: string;
+  startTime: number;
+  endTime: number;
+  description?: string;
+}
+
+// Mock video segments for demonstration
+const videoSegments: VideoSegment[] = [
+  { id: "intro", title: "Introduction", startTime: 0, endTime: 30, description: "Course overview and objectives" },
+  { id: "main", title: "Main Content", startTime: 30, endTime: 300, description: "Core concepts and examples" },
+  { id: "demo", title: "Live Demo", startTime: 300, endTime: 480, description: "Practical demonstration" },
+  { id: "summary", title: "Summary", startTime: 480, endTime: 600, description: "Key takeaways and next steps" },
+];
 
 export default function VideoPlayer({ lesson, onProgress, onComplete }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -18,6 +36,10 @@ export default function VideoPlayer({ lesson, onProgress, onComplete }: VideoPla
   const [volume, setVolume] = useState(1);
   const [showControls, setShowControls] = useState(true);
   const [hasStarted, setHasStarted] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [bookmarks, setBookmarks] = useState<number[]>([]);
+  const [currentSegment, setCurrentSegment] = useState<VideoSegment | null>(null);
+  const [showSegments, setShowSegments] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;

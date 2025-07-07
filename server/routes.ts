@@ -11,6 +11,8 @@ import {
   generateLearningPathSuggestion,
   generateQuizHint,
   generateAdminInsights,
+  generateAdaptiveQuestions,
+  analyzeStudentLearningPattern,
 } from "./gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -326,6 +328,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating quiz hint:", error);
       res.status(500).json({ message: "Failed to generate quiz hint" });
+    }
+  });
+
+  app.get('/api/ai/adaptive-questions/:quizId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const quizId = parseInt(req.params.quizId);
+      const attempts = await storage.getQuizAttempts(userId, quizId);
+      const adaptiveQuestions = await generateAdaptiveQuestions(userId, quizId, attempts);
+      res.json(adaptiveQuestions);
+    } catch (error) {
+      console.error("Error generating adaptive questions:", error);
+      res.status(500).json({ message: "Failed to generate adaptive questions" });
+    }
+  });
+
+  app.get('/api/ai/learning-pattern', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const pattern = await analyzeStudentLearningPattern(userId);
+      res.json(pattern);
+    } catch (error) {
+      console.error("Error analyzing learning pattern:", error);
+      res.status(500).json({ message: "Failed to analyze learning pattern" });
     }
   });
 

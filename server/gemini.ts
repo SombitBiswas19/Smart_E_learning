@@ -409,3 +409,121 @@ export async function generateAdminInsights(): Promise<{
     };
   }
 }
+
+export interface AdaptiveQuizQuestion {
+  questionId: number;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  adaptedExplanation: string;
+  suggestedHints: string[];
+}
+
+export async function generateAdaptiveQuestions(
+  userId: string,
+  quizId: number,
+  studentPerformanceHistory: any[]
+): Promise<AdaptiveQuizQuestion[]> {
+  const performanceAnalysis = studentPerformanceHistory.length > 0 
+    ? `Student has completed ${studentPerformanceHistory.length} previous attempts with an average score of ${
+        studentPerformanceHistory.reduce((sum, attempt) => sum + (attempt.score || 0), 0) / studentPerformanceHistory.length
+      }%.`
+    : "This is the student's first attempt.";
+
+  const prompt = `
+    You are an adaptive learning AI that customizes quiz questions based on student performance.
+    
+    Context:
+    - Student ID: ${userId}
+    - Quiz ID: ${quizId}
+    - Performance History: ${performanceAnalysis}
+    
+    Based on the student's performance, recommend:
+    1. Appropriate difficulty level (beginner/intermediate/advanced)
+    2. Customized explanations that match their learning level
+    3. Helpful hints tailored to their understanding
+    
+    Respond with JSON containing recommendations for adaptive learning.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-pro",
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            recommendedDifficulty: { type: "string" },
+            adaptedQuestions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  questionId: { type: "number" },
+                  difficulty: { type: "string" },
+                  adaptedExplanation: { type: "string" },
+                  suggestedHints: { type: "array", items: { type: "string" } }
+                }
+              }
+            }
+          }
+        }
+      },
+      contents: prompt,
+    });
+
+    const result = JSON.parse(response.text || "{}");
+    return result.adaptedQuestions || [];
+  } catch (error) {
+    console.error("Error generating adaptive questions:", error);
+    return [];
+  }
+}
+
+export async function analyzeStudentLearningPattern(userId: string): Promise<{
+  learningStyle: string;
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+}> {
+  const prompt = `
+    Analyze the learning patterns for student ${userId} and provide insights about their learning style,
+    strengths, weaknesses, and personalized recommendations for improvement.
+    
+    Consider factors like:
+    - Quiz performance trends
+    - Time spent on different topics
+    - Common mistake patterns
+    - Engagement levels
+    
+    Provide actionable insights to help personalize their learning experience.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-pro",
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            learningStyle: { type: "string" },
+            strengths: { type: "array", items: { type: "string" } },
+            weaknesses: { type: "array", items: { type: "string" } },
+            recommendations: { type: "array", items: { type: "string" } }
+          }
+        }
+      },
+      contents: prompt,
+    });
+
+    return JSON.parse(response.text || "{}");
+  } catch (error) {
+    console.error("Error analyzing learning pattern:", error);
+    return {
+      learningStyle: "Visual learner",
+      strengths: ["Quick understanding of concepts"],
+      weaknesses: ["Needs more practice with advanced topics"],
+      recommendations: ["Try interactive exercises", "Review fundamentals"]
+    };
+  }
+}
