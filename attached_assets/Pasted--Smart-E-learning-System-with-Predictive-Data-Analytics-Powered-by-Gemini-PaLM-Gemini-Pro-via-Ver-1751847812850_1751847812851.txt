@@ -1,0 +1,75 @@
+🧠 Smart E-learning System with Predictive Data Analytics
+Powered by Gemini (PaLM/Gemini-Pro via Vertex AI)
+🎯 Objective
+To deliver a personalized, intelligent learning experience with AI-driven predictions, progress analytics, and recommendations, using Google Gemini API for all ML-powered features.
+
+🔑 Core User Roles
+Role	Access & Capabilities
+Admin	Course & user management, analytics monitoring
+Student	Course enrollment, video watching, quiz attempts, feedback
+
+🚀 Functional Modules
+1. Course & Content Management
+Admin-only:
+
+Add/edit/delete courses
+
+Upload videos, add lessons and quizzes
+
+Tag video metadata for tracking (completion %, timestamps)
+
+2. Student Module
+Email and social login (SSO)
+
+Browse/enroll in courses
+
+Watch videos (track time spent)
+
+Attempt quizzes
+
+Dashboard to view progress, performance, and feedback
+
+AI-powered recommendations from Gemini
+
+🤖 AI-Based Features (via Gemini API)
+Feature	Gemini Usage
+Dropout Prediction	Prompt Gemini with student engagement logs (watch time, quiz skips, login frequency)
+Capability Prediction	Ask Gemini to evaluate future performance based on quiz scores, time spent, and interaction history
+Attendance Monitoring	Use activity logs to prompt Gemini for engagement warnings
+IR-Based Question Search	Gemini matches new questions with existing database questions to suggest similar ones
+Content Recommendations	Ask Gemini to suggest next courses/videos based on interest and performance
+Admin Analytics Reports	Use Gemini to summarize course performance, flag weak engagement zones, and highlight top learners
+
+📊 Analytics & Dashboards
+🧑‍🏫 Admin Dashboard
+Course completion stats
+
+Dropout risk alerts
+
+Heatmap of user activity
+
+Gemini-generated reports and summaries
+
+👩‍🎓 Student Dashboard
+Completion %, grades, quiz history
+
+Personalized AI feedback
+
+Smart suggestions for next topics/courses
+
+⚙ Tech Stack
+Layer	Stack
+Frontend	React.js, Tailwind, Chart.js / Recharts
+Backend	FastAPI (Python)
+Database	PostgreSQL (structured data), MongoDB (logs, AI feedback)
+AI Layer	Gemini API via Google Vertex AI SDK
+Security	JWT-based Auth, Role-based Access Control (RBAC)
+
+🔐 Security Considerations
+JWT token authentication
+
+Role-based access: Admin vs Student
+
+Input validation on all endpoints
+
+Secure storage of quiz results and activity logs
